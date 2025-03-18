@@ -1,10 +1,11 @@
 name: Autograding Tests
-'on': {}
+'on':
+- push
+- repository_dispatch
 permissions:
   checks: write
   actions: read
   contents: read
-
 jobs:
   run-autograding-tests:
     runs-on: ubuntu-latest
@@ -12,46 +13,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: pip install pytest bs4 cssutils pytest-json-report
-
-    - name: Run pytest
-      id: pytest-run
-      run: pytest --tb=short --disable-warnings --json-report --json-report-file=results.json
-
-    - name: Process results for autograding
-      id: process-results
-      run: |
-        import json
-        import os
-
-        # JSON fájl beolvasása
-        with open("results.json") as f:
-            data = json.load(f)
-
-        total_score = 0
-        max_score = 40
-
-        # Összegyűjtjük a sikeresen teljesített tesztek pontjait
-        for test in data:
-            if test["status"] == "passed":
-                total_score += test["points"]
-
-        # Ha a pontszám meghaladja a maximumot, vágjuk le
-        total_score = min(total_score, max_score)
-
-        print(f"Final Score: {total_score}/{max_score}")
-
-        # Kiírjuk az összpontszámot GitHub Actions környezeti változóként
-        with open(os.getenv('GITHUB_ENV'), 'a') as f:
-            f.write(f"{total_score}/{max_score}\n")
-
-      shell: python
-
+    - name: Etlap-test
+      id: etlap-test
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        max-score: 15
+        setup-command: pip install pytest bs4 cssutils
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
-        TOTAL_SCORE: "${{ env.TOTAL_SCORE }}"
+        ETLAP-TEST_RESULTS: "${{steps.etlap-test.outputs.result}}"
       with:
-        runners: pytest-run
+        runners: etlap-test
