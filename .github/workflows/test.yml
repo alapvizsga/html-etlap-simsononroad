@@ -1,0 +1,33 @@
+name: Run pytest on student submissions
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install pytest beautifulsoup4 cssutils
+
+      - name: Run tests
+        run: pytest --disable-warnings
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: autograding-results
+          path: results.json
