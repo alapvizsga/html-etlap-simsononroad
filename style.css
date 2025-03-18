@@ -1,0 +1,27 @@
+
+
+body{
+    background-color: #EEFF66;
+    width: 50%;
+    text-align: center;
+    margin: auto;
+    color: #000066;
+    font-style: italic;
+}
+
+.hetek{
+    display: flex;
+    justify-content: space-evenly;
+}
+hr {
+    border: red;
+    background-color: red;
+}
+
+.egynap{
+    display: flex;
+    padding: 10px;  
+    margin-left: 15%;
+    margin-right: 15%;  
+    justify-content: space-around;
+}
